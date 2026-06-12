@@ -1,0 +1,12 @@
+{
+    "extends": "plugin:@sap-ux/eslint-plugin-fiori-tools/defaultTS",
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "project": "./tsconfig.json",
+        "tsconfigRootDir": "c:/Users/egors/internship/com.project.uishop/test"
+    },
+    "rules":{
+        "no-console":"off"
+    }
+}

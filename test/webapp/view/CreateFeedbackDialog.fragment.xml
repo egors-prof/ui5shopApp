@@ -1,0 +1,46 @@
+<core:FragmentDefinition
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.ui.layout.form">
+    <Dialog 
+        id="dlgCreateFeedback" 
+        title="Submit Performance Review" 
+        contentWidth="450px" 
+        type="Message"
+        state="None">
+        <content>
+            <f:SimpleForm
+                id="formFeedbackFields"
+                editable="true"
+                layout="ResponsiveGridLayout"
+                labelSpanXL="3" labelSpanL="3" labelSpanM="3" labelSpanS="12">
+                <f:content>
+                    <Label id="lblFeedbackTarget" text="Review Target" />
+                    <Text id="txtFeedbackTargetName"  text="Resolving Context..." />
+
+                    <Label id="lblFeedbackRating" text="Your Rating" required="true" />
+                    <RatingIndicator 
+                        id="rateFeedbackStars" 
+                        maxValue="5" 
+                        visualMode="Full"
+                        value="5"
+                        class="sapUiTinyMarginBottom" />
+
+                    <Label id="lblFeedbackComment" text="Comments" required="true" />
+                    <TextArea 
+                        id="txtFeedbackComment" 
+                        rows="5" 
+                        growing="true" 
+                        placeholder="Share your experience with us..." />
+                </f:content>
+            </f:SimpleForm>
+        </content>
+        <beginButton>
+            <Button id="btnSubmitFeedback" text="Submit Review" type="Accept" press=".onSubmitFeedbackForm" />
+        </beginButton>
+        <endButton>
+            <Button id="btnCancelFeedback" text="Dismiss" type="Transparent" press=".onCloseFeedbackDialog" />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

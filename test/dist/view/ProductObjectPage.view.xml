@@ -1,0 +1,147 @@
+<mvc:View
+    controllerName="test.controller.ProductObjectPage"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"> <Page 
+        id="productPage" 
+        title="Product Specifications" 
+        showNavButton="true" 
+        navButtonPress=".onNavBack">
+        <content>
+            <HBox id="heroLayout" class="sapUiLargeMargin sapUiResponsiveContentPadding" alignItems="Center" wrap="Wrap">
+                
+                
+                <VBox id="heroTextDetails">
+    <Title id="productMainTitle" text="{title}" titleStyle="H1" class="sapUiTinyMarginBottom" />
+    
+    <HBox id="badgeRow" class="sapUiTinyMarginBottom" alignItems="Center">
+    <ObjectNumber id="productMainPrice" number="{price}" unit="USD" class="sapUiMediumMarginEnd" />
+    
+    <GenericTag 
+        id="ratingTag" 
+        text="{
+            parts: [
+                {path: 'price'},
+                {path: 'stock'},
+                {path: 'timesOrdered'}
+            ],
+            formatter: '.formatMarketingBadgeText'
+        }" 
+        status="{
+            parts: [
+                {path: 'price'},
+                {path: 'stock'},
+                {path: 'timesOrdered'}
+            ],
+            formatter: '.formatMarketingBadgeStatus'
+        }" 
+        design="Full" />
+</HBox>
+    
+    <ObjectStatus 
+        id="productMainStock"
+        
+        state="{
+            parts: [ { path: 'stock' } ],
+            formatter: '.formatStockState'
+        }"
+        class="sapUiMediumMarginBottom" />
+
+
+        
+    <VBox id="ProductActions" alignItems="Start" class="sapUiSmallMarginBottom">
+        <items>
+            <Button 
+                id="heroAddToCartButton" 
+                text="Add to Shopping Cart" 
+                type="Emphasized" 
+                icon="sap-icon://cart-add" 
+                width="220px" 
+                press=".onAddProductToCart"
+                enabled="{= ${stock} > 0 }" 
+                visible="true"/>
+                
+
+            <StepInput 
+                id="productQuantityInput" 
+                value="1" 
+                min="0" 
+                max="{stock}" 
+                width="140px"
+                change=".onObjectPageQuantityChange"
+                visible="false" />
+        </items>
+    </VBox>
+</VBox>
+        
+            </HBox>
+
+            <IconTabBar id="productDetailsTabBar" class="sapUiResponsiveContentPadding" >
+                <items>
+                    <IconTabFilter id="infoTab" icon="sap-icon://hint" text="Product Description" key="productDescription">
+                        <VBox id="descriptionTabContainer" class="sapUiSmallMargin">
+                            <Carousel 
+                                id="productPhotoCarousel" 
+                                
+                                width="100%" 
+                                height="300px"
+                                class="sapUiLargeMarginEnd productHeroElevation">
+                                <pages>
+                                </pages>
+                            </Carousel>
+                            <Title id="descriptionHeader" text="About this Item" level="H4" class="sapUiSmallMarginBottom" />
+                            <Text id="descriptionBody" text="{desc}" class="sapUiMediumMarginBottom" />
+                            
+                            <FormattedText id="sectionDivider" htmlText="&lt;hr/&gt;" class="sapUiMediumMarginBottom" />
+                            
+                            <Title id="chartHeader" text="Historical Price Variations (Quarterly Trend)" level="H4" class="sapUiSmallMarginBottom" />
+                            <Text id="chartSubheader" text="Market baseline variations logged across past fiscal cycles." class="sapUiMutedText sapUiMediumMarginBottom" />
+                            
+                            <VBox id="chartWrapper" width="100%" class="sapUiContentPadding" >
+                                <items>
+                                    <Label id="lblQ1" text="Q1 Valuation (Initial Market Entry Value)" class="sapUiTinyMarginTop" />
+                                    <ProgressIndicator id="piQ1" percentValue="90" displayValue="{priceChart>/q1} USD" showValue="true" state="None" class="sapUiSmallMarginBottom" />
+                                    
+                                    <Label id="lblQ2" text="Q2 Valuation (Mid-Year Market Adjustments)" />
+                                    <ProgressIndicator id="piQ2" percentValue="75" displayValue="{priceChart>/q2} USD" showValue="true" state="Success" class="sapUiSmallMarginBottom" />
+                                    
+                                    <Label id="lblCurrent" text="Current Active Valuation (Live SQLite Catalog State)" />
+                                    <ProgressIndicator id="piCurrent" percentValue="100" displayValue="{priceChart>/current} USD" showValue="true" state="Information" />
+                                </items>
+                            </VBox>
+                        </VBox>
+                    </IconTabFilter>
+
+                    <IconTabFilter id="specsTab" icon="sap-icon://attachment" text="Technical Specifications">
+                        <f:SimpleForm id="specsForm" editable="false" layout="ColumnLayout">
+                            <f:content>
+                                <core:Title id="dimensionsTitle" text="Logistics &amp; Supply Chain" />
+                                <Label id="lblVendor" text="Supplier Vendor Name" />
+                                <Text id="txtVendor" text="{vendor/name}" />
+                                <Label id="lblTimesOrdered" text="Popularity (Times Ordered)" />
+                                <Text id="txtTimesOrdered" text="{timesOrdered}" />
+                            </f:content>
+                        </f:SimpleForm>
+                    </IconTabFilter>
+                    <IconTabFilter id="reviewsTab" text="Reviews" icon="sap-icon://favorite">
+                        <List 
+        id="ReviewList" 
+        items="{reviews}"
+        noDataText="There are no reviews yet. Be the first to leave one!">
+        
+        <FeedListItem
+            id="itemDetails"
+            sender="Anonymous Customer"
+            icon="sap-icon://customer"
+            info="{rating} / 5 Stars"
+            text="{comment}" />
+            
+    </List>
+                    </IconTabFilter>
+                    
+                </items>
+            </IconTabBar>
+        </content>
+    </Page>
+</mvc:View>

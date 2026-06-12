@@ -1,0 +1,291 @@
+<mvc:View
+    controllerName="test.controller.CustomerDashboard"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:sapF="sap.f"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    xmlns:grid="sap.ui.layout.cssgrid">
+    
+    <Page 
+        id="dashboardPage" 
+        title="Customer Account Dashboard" 
+        showNavButton="true" 
+        navButtonPress=".onNavBack">
+        <content>
+            <IconTabBar 
+                id="dashboardTabBar" 
+                select=".onTabSelect" 
+                selectedKey="profileTab" 
+                class="sapUiResponsiveContentPadding">
+                <items>
+                    
+                    <IconTabFilter id="dashboardProfileTabFilter" key="profileTab" text="My Profile" icon="sap-icon://employee">
+                        <VBox id="dashboardProfileMainLayout" class="sapUiMediumMargin" gap="5px" >
+                            <Button id="authButton" text="Authenticate" press=".authPress"/>
+                            
+                            <Panel id="dashboardProfilePanel" headerText="Personal Information" class="sapUiSmallMarginBottom">
+                                <content>
+                                    <VBox id="personalInfoBox">
+                                        <HBox id ="fullNameBox" gap="5px">
+                                            <Text id="fullNameLabel" class="profileText"   text="Name: "/>
+                                            <Text id="fullNameText" class="profileText"/>
+                                        </HBox>
+                                        <HBox id ="EmailBox" gap="5px">
+                                            <Text id="emailLabel" text="E-mail: " class="profileText"/>
+                                            <Text id="emailText" class="profileText"/>
+                                        </HBox>
+
+                                        <HBox id="StatusBox" gap="5px">
+                                            <Text id="statusLabel" class="profileText"  text="Status: "/>
+                                            <Text id="statusText" class="profileText"/>
+                                        </HBox>
+                                        
+                                        
+                                        
+
+
+                                    </VBox>
+                                    
+                                </content>
+                            </Panel>
+
+                            <Button 
+                                id="showOrdersButton"
+                                text="Show Order History" 
+                                icon="sap-icon://history"
+                                type="Emphasized"
+                                press=".onShowOrdersPress"
+                                class="sapUiSmallMarginBottom" />
+
+                            <Table 
+                                id="ordersHistoryTable"
+                                visible="false"
+                                items="{
+                                    path: '/Orders',
+                                    parameters: {
+                                        $orderby: 'createdAt desc'
+                                    }
+                                }">
+                                <headerToolbar>
+                                    <OverflowToolbar id="ordersHistoryHeaderToolbar">
+                                        <Title id="ordersHistoryTableTitle" text="Past Orders Ledger" level="H2" />
+                                    </OverflowToolbar>
+                                </headerToolbar>
+                                <columns>
+                            
+                                    <Column id="orderDateColumn" minScreenWidth="Tablet" demandPopin="true"><Text id="orderDateHeader" text="Date Placed" /></Column>
+                                    <Column id="orderAmountColumn" hAlign="End"><Text id="orderAmountHeader" text="Total Amount" /></Column>
+                                </columns>
+                                <items>
+                                    <ColumnListItem 
+                                        id="ordersHistoryRowTemplate" 
+                                        type="Navigation"
+                                        press=".onOrderRowPress">
+                                        <cells>
+
+                                            <Text id="historyOrderDateCell" text="{createdAt}" />
+                                            <ObjectNumber 
+                                                id="historyOrderAmountCell"
+                                                number="{
+                                                    path: 'totalAmount',
+                                                    type: 'sap.ui.model.type.Float',
+                                                    formatOptions: {
+                                                        minFractionDigits: 2,
+                                                        maxFractionDigits: 2
+                                                    }
+                                                }" 
+                                                unit="USD"
+                                                state="Success" />
+                                        </cells>
+                                    </ColumnListItem>
+                                </items>
+                            </Table>
+                        </VBox>
+                    </IconTabFilter>
+
+                    <IconTabFilter id="cartTab" icon="sap-icon://cart" text="Shopping Cart" key="cartTab">
+                        <List
+                            id="dashboardCartList"
+                            noDataText="Your cart is empty. Add some tech!"
+                            items="{
+                                path: '/OrderItems',
+                                parameters: {
+                                    $filter: 'IsActiveEntity eq false',
+                                    $expand: 'product'
+                                }
+                            }"> 
+                            <items>
+                                <CustomListItem id="dashboardCartItemRow" class="sapUiContentPadding">
+                                    <HBox id="dashboardCartItemRowFlexLayout" alignItems="Center" gap="50px"  class="sapUiSmallMargin" width="100%">
+                                        <HBox id="dashboardCartItemLeftSection" alignItems="Center">
+                                            <Avatar 
+                                                id="dashboardCartItemImage"
+                                                src="{product/content}" 
+                                                displaySize="L" 
+                                                displayShape="Square" 
+                                                class="sapUiSmallMarginEnd" />
+                                            
+                                            <VBox id="dashboardCartItemDetailsContainer">
+                                                <Title id="parentText" text="{parent_ID}" visible="false"/>
+                                                <Title id="dashboardCartItemTitle" text="{product/title}" level="H6" titleStyle="H6" class="sapUiTinyMarginBottom" />
+                                                <Title id="dashboardCartQuantity" text="Quantity: {quantity}" level="H6" titleStyle="H6" class="sapUiTinyMarginBottom" />
+                                                <HBox id="cartItemPriceLayout" alignItems="Center">
+                                                    <ObjectNumber id="priceObjectNumber" number="{priceAtOrder}" class="sapUiTinyMarginEnd" />
+                                                    <Text id="mockCurrency" text="USD" class="sapUiMutedText" />
+                                                </HBox>
+                                            </VBox>
+                                        </HBox>
+                                        <Button id="dashboardCartItemDeleteButton" icon="sap-icon://delete" type="Reject" press=".onRemoveCartItem" />
+                                    </HBox>
+                                </CustomListItem>
+                            </items>
+                        </List>
+                    </IconTabFilter>
+
+                    <IconTabFilter id="interactionsTab" icon="sap-icon://customer-briefing" text="Support Cases" key="interactionsTab">
+                        <VBox id="interactionsMainLayout" class="sapUiMediumMargin">
+                            <Table 
+                                id="customerInteractionsTable" 
+                                items="{
+                                    path: '/Interactions',
+                                    parameters: {
+                                        $orderby: 'createdAt desc'
+                                    }
+                                }"
+                                growing="true"
+                                growingThreshold="10"
+                                noDataText="No support cases logged for this account.">
+                                <headerToolbar>
+                                    <OverflowToolbar id="tbInteractionsHeader">
+                                        <Title id="ttlInteractionsTable" text="Help Desk Interaction History" level="H2" />
+                                    </OverflowToolbar>
+                                </headerToolbar>
+                                <columns>
+                                    <Column id="colCaseNum" width="15%"><Text id="txtCaseNumHeader" text="Case Number" /></Column>
+                                    <Column id="colTitle" width="45%"><Text id="txtTitleInteractionHeader" text="Subject Title" /></Column>
+                                    <Column id="colStatus" hAlign="Center"><Text id="txtStatus" text="Ticket Status" /></Column>
+                                    <Column id="colRowActionsInteractions" hAlign="End"><Text id="txtRowActionsInteractions" text="Actions" /></Column>
+                                </columns>
+                                <items>
+                                    <ColumnListItem id="InteractionsItemRowTemplate">
+                                        <cells>
+                                            <Text id="txtCaseNum" text="{caseNumber}"  />
+                                            <Text id="txtTitle" text="{title}" />
+                                            
+                                            <ObjectStatus 
+                                                id="statusState" 
+                                                text="{status_code}" 
+                                                state="{
+                                                    path: 'status_code',
+                                                    formatter: '.formatStatusCriticality'
+                                                }" />
+                                            
+                                            <Button 
+                                                id="btnRowInteractionFeedback" 
+                                                text="Rate Resolution" 
+                                                type="Transparent" 
+                                                icon="sap-icon://survey" 
+                                                press=".onOpenInteractionFeedback" />
+                                        </cells>
+                                    </ColumnListItem>
+                                </items>
+                            </Table>
+                        </VBox>
+                    </IconTabFilter>
+
+                    <IconTabFilter id="wishlistTab" text="Wishlist" icon="sap-icon://heart" key="wishlistTab">
+                        <VBox id="wishlistMainBox">
+                            <sapF:GridList 
+                                id="wishlistGrid"
+                                noDataText="No products in wishlist. Browse products and add the first one."
+                                items="{
+                                    path: '/Wishlist',
+                                    parameters: {
+                                        $expand: 'product'
+                                    }
+                                }">
+                                <sapF:customLayout>
+                        <grid:GridBoxLayout 
+                            id="wishlistLayout"
+                            boxesPerRowConfig="XL6 L4 M3 S1"
+                            boxMinWidth="240px" />
+                        </sapF:customLayout>
+                        <sapF:items>
+                            <CustomListItem 
+                        id="wishlistGridItem"
+                        type="Active" 
+                        press=".onProductPress">
+                        <VBox id="wishlistCardContainer" class="sapUiSmallMargin"  justifyContent="SpaceBetween" alignItems="Center"  height="300px">
+                            <HBox id="wishlistHeader" width="100%" justifyContent="End" class="sapUiTinyMarginEnd">
+
+                            <core:Icon
+                                id="btnDeleteWishlistItem"
+                                src="sap-icon://decline"
+                                class="myCardDeleteCross"
+                                tooltip="Remove from Wishlist"
+                                press=".onRemoveFromWishlist" />
+                                </HBox>
+                            <items>
+                                <Image 
+                                    id="gridWishlistImage"
+                                    src="{product/content}" 
+                                    width="100%"
+                                    height="100px"
+                                    
+                                    
+                                    class="sapUiSmallMarginBottom" />
+                                
+                                <Title 
+                                    id="gridWislistTitle"
+                                    text="{product/title}" 
+                                    wrapping="true" 
+                                    titleStyle="H6"
+                                    textAlign="Center"
+                                    class="sapUiTinyMarginBottom" />
+                                
+                                <ObjectNumber 
+                                    id="gridWishlistPrice"
+                                    number="{product/price}" 
+                                    unit="USD"
+                                    class="sapUiTinyMarginBottom" />
+                                
+                                <ObjectStatus 
+                                    id="gridWishlistStock"
+                                    text="{= ${product/stock} > 0 ? ${product/stock} + ' in stock' : 'Out of Stock' }" 
+                                    state="{= ${product/stock} > 10 ? 'Success' : (${product/stock} > 0 ? 'Warning' : 'Error') }" />
+                                
+                                <VBox id="gridWishlistActions" alignItems="Center" class="sapUiTinyMarginTop">
+                           
+                                    
+
+                                    
+                                </VBox>
+                            </items>
+                        </VBox>
+                        
+                    </CustomListItem>
+                        </sapF:items>        
+
+                            </sapF:GridList>
+                        </VBox>
+                    </IconTabFilter>
+
+                </items>
+            </IconTabBar>
+        </content>
+        <footer>
+            <OverflowToolbar id="cartFooterToolbar">
+                <ToolbarSpacer id="spacer"/>
+                <Label id="totaLabel" text="Total Cart Amount:" design="Bold" />
+                <ObjectNumber
+                    id="totalNumber"
+                    number="{cartState>/totalCartAmount}"
+                    unit="USD"
+                    state="Success"
+                    class="sapMObjectNumberLarge" />
+                <Button id="totalButton" text="Checkout" type="Accept" press=".onCheckoutPress" />
+            </OverflowToolbar>
+        </footer>
+    </Page>
+</mvc:View>

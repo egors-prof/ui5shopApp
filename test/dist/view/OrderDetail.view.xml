@@ -1,0 +1,105 @@
+<mvc:View
+    controllerName="test.controller.OrderDetail"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <Page 
+        id="orderDetailPage" 
+        title="Order Specifications" 
+        showNavButton="true" 
+        navButtonPress=".onNavBack">
+        <content>
+            <FlexBox id="headerLayoutWrapper" alignItems="Start" justifyContent="SpaceBetween" width="100%">
+                <items>
+                    
+                    <ObjectHeader
+                        id="orderDetailHeader"
+                        title="Order Details Ledger"
+                        >
+                        <attributes>
+                            <ObjectAttribute id="attrStatus" text="Status Code: {status_code}" />
+                        </attributes>
+                    </ObjectHeader>
+
+                    <VBox id="headerActionButtons" class="sapUiMediumMarginTop sapUiMediumMarginEnd" >
+                        <items>
+                            <Button 
+                                id="btnOrderLeaveFeedback" 
+                                text="Rate Experience" 
+                                type="Neutral" 
+                                width="100%"
+                                icon="sap-icon://survey" 
+                                press=".onOpenOrderFeedback" />
+
+                            <Button 
+                                id="btnOrderGlobalInteraction" 
+                                width="100%"
+                                text="Report Order Issue" 
+                                type="Default" 
+                                icon="sap-icon://alert" 
+                                press=".onCreateOrderInteraction" />
+                        </items>
+                    </VBox>
+                        
+                </items>
+            </FlexBox>
+
+            <Table 
+                id="orderItemsDetailedTable" 
+                items="{path: 'items'}">
+                <headerToolbar>
+                    <OverflowToolbar id="itemsTableToolbar">
+                        <Title id="itemsTableTitle" text="Purchased Line Items Ledger" level="H2" />
+                    </OverflowToolbar>
+                </headerToolbar>
+                <columns>
+                    <Column id="colQty" hAlign="Center"><Text id="ColPreviewContext" text="Preview" /></Column>
+                    <Column id="colPrice" hAlign="Center"><Text id="ColPriceText" text="Unit Price" /></Column>
+                    <Column id="Price" hAlign="Center"><Text id="priceText" text="Price" /></Column>
+                    <Column id="colRowActions" hAlign="Center"><Text id="ColActionText" text="Actions" /></Column>
+
+                </columns>
+                <items>
+                    <ColumnListItem id="itemRowTemplate">
+                        <cells>
+                            <VBox id="vboxcell">
+                                <Avatar 
+                                    id="OrderListProductImage"
+                                    src="{product/content}" 
+                                    displaySize="XL" 
+                                    displayShape="Square"
+                                    class="sapUiSmallMarginBottom" />
+                                    
+                                <Text id="txtHiddenVendor" text="{product_vendor_ID}" visible="false" />
+                            </VBox>
+                            
+                            <Text id="QuantityText" text="{quantity}" />
+                            
+                            <ObjectNumber id="PriceAtOrderText" number="{priceAtOrder}" unit="USD" state="Warning" />
+                            
+                            <VBox id="rowActionContainer" justifyContent="End" >
+                                <items>
+                                    <Button 
+                                        id="btnRowItemFeedback" 
+                                        text="Rate Product" 
+                                        width="100%"
+                                        type="Neutral" 
+                                        icon="sap-icon://favorite-list" 
+                                        press=".onOpenItemFeedback" />
+
+                                    <Button 
+                                        id="btnRowItemInteraction" 
+                                        text="Report Item Issue" 
+                                        width="100%"
+                                        type="Default" 
+                                        icon="sap-icon://customer-briefing" 
+                                        press=".onCreateItemInteraction" />
+                                </items>
+                            </VBox>
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+    </Page>
+</mvc:View>
