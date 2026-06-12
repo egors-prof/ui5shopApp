@@ -1,0 +1,2 @@
+sap.ui.define(["sap/ui/test/Opa5","sap/ui/test/matchers/I18NText"],function(e,t){"use strict";e.createPageObjects({onTheMainViewPage:{actions:{},assertions:{theTitleShouldBeCorrect:function(){return this.waitFor({id:"page",viewName:"MainView",matchers:new t({key:"title",propertyName:"title",parameters:"test"}),success:function(){e.assert.ok(true,"The page has the correct title")},errorMessage:"The page does not have the correct title"})}}}})});
+//# sourceMappingURL=MainView.js.map

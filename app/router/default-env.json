@@ -1,0 +1,30 @@
+{
+    "VCAP_SERVICES": {
+    "xsuaa": [
+      {
+        "name": "crm-project-auth",
+        "label": "xsuaa",
+        "tags": ["xsuaa"],
+        "credentials": {
+          "clientid": "sb-crm-project-f37788detrial-dev!t657209",
+          "clientsecret": "d2d6ca61-add1-48e1-b3fe-b867389a00a6$idpMAKz5pqf3PMVTo6bwib2jxAkVxbo9hS-pLegdE6Q=",
+          "url": "https://f37788detrial.authentication.us10.hana.ondemand.com",
+          "identityzone": "f37788detrial"
+        }
+      }
+    ]
+  },
+
+  "destinations": [
+    {
+      "name": "srv-api",
+      "url": "https://f37788detrial-dev-crm-project-srv.cfapps.us10-001.hana.ondemand.com", 
+      "forwardAuthToken": true
+    },
+    {
+      "name": "ui5-server",
+      "url": "http://localhost:8080",
+      "forwardAuthToken": false
+    }
+  ]
+}

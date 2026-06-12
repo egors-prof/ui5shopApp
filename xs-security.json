@@ -1,0 +1,57 @@
+{
+  "xsappname": "uishop-frontend-unique",
+  "tenant-mode": "dedicated",
+  "scopes": [
+    {
+      "name": "$XSAPPNAME.CRMAdmin",
+      "description": "Admin Scope"
+    },
+    {
+      "name": "$XSAPPNAME.Vendor",
+      "description": "Vendor Scope"
+    },
+    {
+      "name": "$XSAPPNAME.Customer",
+      "description": "Customer Scope"
+    }
+  ],
+  "attributes": [
+    {
+      "name": "vendorId",
+      "description": "Vendor GUID",
+      "valueType": "string"
+    },
+    {
+      "name": "customerId",
+      "description": "Customer GUID",
+      "valueType": "string"
+    }
+  ],
+  "role-templates": [
+    {
+      "name": "CRMAdmin_Template",
+      "description": "Admin Roles",
+      "scope-references": ["$XSAPPNAME.CRMAdmin"]
+    },
+    {
+      "name": "Vendor_Template",
+      "description": "Vendor Partner Roles",
+      "scope-references": ["$XSAPPNAME.Vendor"],
+      "attribute-references": ["vendorId"]
+    },
+    {
+      "name": "Customer_Template",
+      "description": "Customer Portal Roles",
+      "scope-references": ["$XSAPPNAME.Customer"],
+      "attribute-references": ["customerId"]
+    }
+  ],
+  "oauth2-configuration": {
+    "redirect-uris": [
+      "http://localhost:5000/**",
+      "http://localhost:8080/**",
+      "https://f37788detrial-dev-com-project-approuter.cfapps.us10-001.hana.ondemand.com/**",
+      "https://*.cfapps.us10-001.hana.ondemand.com/**"
+    ]
+  }
+}

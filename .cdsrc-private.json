@@ -1,0 +1,20 @@
+{
+  "requires": {
+    "[hybrid]": {
+      "auth": {
+        "binding": {
+          "type": "cf",
+          "apiEndpoint": "https://api.cf.us10-001.hana.ondemand.com",
+          "org": "f37788detrial",
+          "space": "dev",
+          "instance": "crm-project-auth",
+          "key": "crm-project-auth-key"
+        },
+        "kind": "xsuaa-auth",
+        "vcap": {
+          "name": "auth"
+        }
+      }
+    }
+  }
+}

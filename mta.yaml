@@ -1,0 +1,32 @@
+_schema-version: "3.2"
+ID: com.project.uishop
+version: 0.0.1
+
+modules:
+  - name: com-project-approuter
+    type: approuter.nodejs
+    path: app/router
+    requires:
+      - name: uishop-auth
+      - name: srv-api-destination
+    parameters:
+      memory: 256M
+      disk-quota: 256M
+    properties:
+      XSUAA_AUTHENTICATION_METHOD: route
+      destinations: '[{"name":"srv-api","url":"https://f37788detrial-dev-crm-project-srv.cfapps.us10-001.hana.ondemand.com","forwardAuthToken":true}]'
+
+resources:
+  - name: uishop-auth
+    type: org.cloudfoundry.existing-service
+    parameters:
+      service: crm-project-auth
+
+  - name: srv-api-destination
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: destination
+      service-plan: lite
+
+parameters:
+  enable-parallel-deployments: true
