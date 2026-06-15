@@ -1,0 +1,2 @@
+const{wdi5:wdi5}=require("wdio-ui5-service");describe("samples",()=>{it("should log",()=>{const e=wdi5.getLogger();e.log("hello world!")});it.skip("should retrieve a UI5 control",async()=>{const e={selector:{controlType:"sap.m.App",viewName:"ui5.typescript.helloworld.view.App"}};const o=await browser.asControl(e);expect(o).toBeDefined()})});
+//# sourceMappingURL=sample.test.js.map

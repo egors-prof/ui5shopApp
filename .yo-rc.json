@@ -1,0 +1,16 @@
+{
+  "generator-ui5-project": {
+    "namespaceUI5": "com.project",
+    "projectName": "uishop",
+    "uimoduleName": "test",
+    "enableFPM": false,
+    "platform": "Static webserver",
+    "ui5Libs": "Content delivery network (OpenUI5)",
+    "newDir": true,
+    "initRepo": false,
+    "projectId": "com.project.uishop",
+    "uimodules": [
+      "test"
+    ]
+  }
+}

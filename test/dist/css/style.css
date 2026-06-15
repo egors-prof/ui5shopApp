@@ -1,0 +1,80 @@
+/* Enter your custom styles here */
+/* Custom background card for the OpenUI5 historical pricing layout section */
+.priceTrendCard {
+    background-color: #fafafa !important;
+    border: 1px solid #eaeaea !important;
+    border-radius: 8px !important;
+}
+
+.wishlistHeartButton.sapMBtnReject .sapMBtnIcon .sapMBtnInner {
+    color: #e53935 !important; /* Premium Crimson Ruby Red */
+    transform: scale(1.2) !important;
+    text-shadow: 0 0 4px rgba(229, 57, 53, 0.4);
+    margin-right: 10px;
+}
+
+/* 2. Soft fallback transition when hovering over the active red heart button */
+.wishlistHeartButton.sapMBtnReject:hover .sapMBtnIcon {
+    color: #d32f2f !important; /* Slightly deeper dark red on hover */
+    transform: scale(1.25) !important;
+}
+
+.floatingCartButton {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 100;
+    border-radius: 50%;
+    width: 3.5rem;
+    height: 3.5rem;
+}
+
+.productQuantityLabel {
+    position: fixed;
+    bottom: 2.7rem;
+    right: 1.35rem;
+    z-index: 101;
+    width: 23px !important;             
+    height: 23px !important;
+    color: #ffffff !important;          
+    background-color: #e00000 !important;
+    font-size: 0.6rem !important;       
+    font-weight: thin !important;
+    padding: 5px 9px !important;       
+    border-radius: 12px !important;     
+    text-align: center;
+    display: inline-block;
+}
+
+.profileText{
+    font-size: 1rem;
+}
+
+
+.circle{
+
+    background-color: #107e3e;
+    
+    border-radius: 50%; 
+    
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease-in-out;
+}
+
+.myCardDeleteCross {
+    position: absolute !important;
+    top: 14px;
+    right: 14px;
+    color: #888888;
+    cursor: pointer;
+    z-index: 10;
+    font-size: 1.1rem;
+    transition: color 0.15s ease-in-out, transform 0.15s ease-in-out;
+    padding :10px;
+    border-radius: 50%;
+}
+
+.myCardDeleteCross:hover {
+    color: #bb0000 !important; 
+    transform: scale(1.15);
+}

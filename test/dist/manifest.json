@@ -1,0 +1,154 @@
+{
+    "_version": "1.60.0",
+    "sap.app": {
+        "id": "test",
+        "type": "application",
+        "i18n": "i18n/i18n.properties",
+        "applicationVersion": {
+            "version": "0.0.1"
+        },
+        "title": "{{appTitle}}",
+        "description": "{{appDescription}}",
+        "resources": "resources.json",
+        "sourceTemplate": {
+            "id": "@sap-ux/fiori-freestyle-writer:basic",
+            "version": "0.21.10"
+        },
+        "dataSources": {
+            "mainService": {
+                "uri": "/odata/v4/public-storefront/",
+                "type": "OData",
+                "settings": {
+                    "odataVersion": "4.0"
+                }
+            }
+}
+    },
+    "sap.ui": {
+        "technology": "UI5",
+        "icons": {
+            "icon": "",
+            "favIcon": "",
+            "phone": "",
+            "phone@2": "",
+            "tablet": "",
+            "tablet@2": ""
+        },
+        "deviceTypes": {
+            "desktop": true,
+            "tablet": true,
+            "phone": true
+        }
+    },
+    "sap.ui5": {
+        "flexEnabled": true,
+        "config": {
+            "bindingSyntax": "complex"
+        },
+        "dependencies": {
+            "minUI5Version": "1.136.1",
+            "libs": {
+                "sap.m": {},
+                "sap.ui.core": {}
+            }
+        },
+        "contentDensities": {
+            "compact": true,
+            "cozy": true
+        },
+        "models": {
+            "i18n": {
+                "type": "sap.ui.model.resource.ResourceModel",
+                "settings": {
+                    "bundleName": "test.i18n.i18n"
+                }
+            },
+        "": {
+            "dataSource": "mainService",
+            "preload": true,
+            "settings": {
+                "operationMode": "Server",
+                "autoExpandSelect": true,
+                "earlyRequests": true,
+                "odataVersion": "4.0"
+            }
+        }
+        },
+        "resources": {
+            "css": [
+                {
+                    "uri": "css/style.css"
+                }
+            ]
+        },
+        "routing": {
+            "config": {
+                "routerClass": "sap.m.routing.Router",
+                "viewType": "XML",
+                "async": true,
+                "viewPath": "test.view",
+                "controlAggregation": "pages",
+                "controlId": "app",
+                "clearControlAggregation": false
+            },
+            "routes": [
+                {
+                    "name": "RouteCustomerDashboard",
+                    "pattern": "dashboard{?query}",
+                    "target": ["TargetCustomerDashboard"]
+                },
+                {
+                    "name": "RouteMainView",
+                    "pattern": ":?query:",
+                    "target": ["TargetMainView"]
+                },
+                {
+                    "name": "RouteOrderDetail",
+                    "pattern": "order/{orderId}",
+                    "target": ["TargetOrderDetail"]
+                },
+                {
+                    "name": "RouteProductObjectPage",
+                    "pattern": "product/{productId}",
+                    "target": ["TargetProductObjectPage"]
+                }
+                
+                
+            ],
+            "targets": {
+                "TargetMainView": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "MainView",
+                    "viewName": "MainView"
+                },
+                "TargetCustomerDashboard": {
+                    "viewName": "CustomerDashboard",
+                    "viewType": "XML",
+                    "viewLevel": 2
+                },
+                "TargetOrderDetail": {
+                    "viewName": "OrderDetail",
+                    "viewType": "XML",
+                    "viewLevel": 3
+                },
+                "TargetProductObjectPage": {
+                    "viewName": "ProductObjectPage",
+                    "viewLevel": 3
+                }
+                
+                
+            }
+                           
+        },
+        "rootView": {
+            "viewName": "test.view.App",
+            "type": "XML",
+            "async": true,
+            "id": "appView"
+        }
+        }
+        
+}
+

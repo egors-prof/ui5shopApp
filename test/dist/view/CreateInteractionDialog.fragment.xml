@@ -1,0 +1,45 @@
+<core:FragmentDefinition
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.ui.layout.form">
+    <Dialog 
+        id="dlgCreateInteraction" 
+        title="Open Support Case" 
+        contentWidth="500px" 
+        type="Message"
+        state="Information">
+        <content>
+            <f:SimpleForm
+                id="formInteractionDetails"
+                editable="true"
+                layout="ResponsiveGridLayout"
+                labelSpanXL="3" labelSpanL="3" labelSpanM="3" labelSpanS="12">
+                <f:content>
+                    <Label id="lblFormTitle" text="Issue Title" required="true" />
+                    <Input id="txtInteractionTitle" placeholder="Briefly summarize the issue (e.g., Broken spacebar)" />
+
+                    <Label id="lblFormPriority" text="Priority Level" required="true" />
+                    <Select id="selInteractionPriority" selectedKey="MEDIUM">
+                        <core:Item id="itemLow" key="LOW" text="Low - General Question" />
+                        <core:Item id="itemMedium" key="MEDIUM" text="Medium - Functional Issue" />
+                        <core:Item id="itemHigh" key="HIGH" text="High - Damaged / Missing Item" />
+                    </Select>
+
+                    <Label id="lblFormSummary" text="Detailed Summary" required="true" />
+                    <TextArea 
+                        id="txtInteractionSummary" 
+                        rows="6" 
+                        growing="true" 
+                        placeholder="Please describe exactly what happened..." />
+                </f:content>
+            </f:SimpleForm>
+        </content>
+        <beginButton>
+            <Button id="btnSubmitForm" text="Submit Ticket" type="Accept" press=".onSubmitInteractionForm" />
+        </beginButton>
+        <endButton>
+            <Button id="btnCancelForm" text="Cancel" type="Transparent" press=".onCloseInteractionDialog" />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

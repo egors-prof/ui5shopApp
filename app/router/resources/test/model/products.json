@@ -1,0 +1,25 @@
+{
+  "items": [
+    {
+      "id": "1",
+      "name": "SonicPro Wireless Headphones",
+      "category": "Audio",
+      "price": 299.99,
+      "stock": "In Stock"
+    },
+    {
+      "id": "2",
+      "name": "Lumina Watch Series X",
+      "category": "Wearables",
+      "price": 199.00,
+      "stock": "Low Stock"
+    },
+    {
+      "id": "3",
+      "name": "UltraView 27\" 4K Monitor",
+      "category": "Displays",
+      "price": 450.00,
+      "stock": "Out of Stock"
+    }
+  ]
+}
