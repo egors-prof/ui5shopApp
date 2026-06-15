@@ -292,7 +292,6 @@ export default class MainView extends Controller {
         }
     }
 
-    // Navigation methods - no auth check needed
     public onMyAccountPress(): void {
         const oRouter = UIComponent.getRouterFor(this);
         oRouter.navTo("RouteCustomerDashboard", {});
@@ -406,7 +405,6 @@ export default class MainView extends Controller {
 
         const oWishlistListBinding = (oModel as any).bindList("/Wishlist");
 
-        // Use separate filter calls
         oWishlistListBinding.filter([
             new Filter("customer_ID", FilterOperator.EQ, sCustomerId),
             new Filter("product_ID", FilterOperator.EQ, sProductId)

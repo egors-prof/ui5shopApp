@@ -41,13 +41,11 @@ export default class OrderDetail extends Controller {
     const sOrderId = oEvent.getParameter("arguments").orderId;
     const oView = this.getView() as any  ;
 
-    // 🟢 THE BULLETPROOF ODV4 FIX: Format both composite primary keys inside the canonical path string.
-    // Note: The GUID string must be wrapped inside its own single quotes, and IsActiveEntity passes without quotes!
+  
     const sCanonicalODataPath = `/Orders(ID='${sOrderId}',IsActiveEntity=true)`;
 
     console.log(`🎯 Binding Order Detail view to absolute context path: ${sCanonicalODataPath}`);
 
-    // 🟢 FIXED: Forcing the OData V4 model engine to explicitly select your custom vendor column
     oView.bindElement({
         path: sCanonicalODataPath,
         parameters: {
@@ -73,8 +71,6 @@ public onCreateOrderInteraction(oEvent: any): void {
         const oOrderContext = this.getView()!.getBindingContext();
         if (!oOrderContext) { return; }
         const oOrderData = oOrderContext.getObject() as any;
-
-        // Cache the target identifiers needed for our database insertion payload
         this._oActiveTicketTarget = {
             order_ID: oOrderData.ID,
             orderItem_ID: null,
@@ -90,8 +86,6 @@ public onCreateOrderInteraction(oEvent: any): void {
 
     private async _openInteractionFormDialog(): Promise<void> {
         const oView = this.getView()!;
-
-        // Instantiate the popout fragment only if it doesn't exist yet in memory
         if (!this._oDialog) {
             this._oDialog = await Fragment.load({
                 id: oView.getId(),
@@ -101,16 +95,13 @@ public onCreateOrderInteraction(oEvent: any): void {
             oView.addDependent(this._oDialog);
         }
 
-        // Pre-populate the title input box with a helpful default value
         (oView.byId("txtInteractionTitle") as any).setValue(this._oActiveTicketTarget.defaultTitle);
         (oView.byId("txtInteractionSummary") as any).setValue(""); // Reset any prior text entries
 
         this._oDialog.open();
     }
 
-    /**
-     * Form Cancel Action: dismisses the pop out canvas cleanly
-     */
+
     public onCloseInteractionDialog(): void {
         if (this._oDialog) {
             this._oDialog.close();
@@ -135,9 +126,6 @@ public onOpenOrderFeedback(oEvent: any): void {
         this._openFeedbackDialog();
     }
 
-    /**
-     * TRIGGER B: Open feedback form for a specific VENDOR_ITEM row
-     */
     public onOpenItemFeedback(oEvent: any): void {
         const oRowContext = oEvent.getSource().getBindingContext();
         if (!oRowContext) return;
@@ -154,25 +142,22 @@ public onOpenOrderFeedback(oEvent: any): void {
         this._openFeedbackDialog();
     }
 
-    /**
-     * Asynchronously loads and presents the modal canvas fragment
-     */
+
     private async _openFeedbackDialog(): Promise<void> {
         const oView = this.getView()!;
 
         if (!this._oFeedbackDialog) {
             this._oFeedbackDialog = await Fragment.load({
                 id: oView.getId(),
-                name: "test.view.CreateFeedbackDialog", // Adjust namespace prefix string to match manifest
+                name: "test.view.CreateFeedbackDialog", 
                 controller: this
             }) as Dialog;
             oView.addDependent(this._oFeedbackDialog);
         }
 
-        // Dynamically adjust descriptive UI label text mapping before opening
         (oView.byId("txtFeedbackTargetName") as any).setText(this._oActiveFeedbackContext.targetName);
-        (oView.byId("rateFeedbackStars") as any).setValue(5); // Reset to default full score
-        (oView.byId("txtFeedbackComment") as any).setValue(""); // Reset prior comment logs
+        (oView.byId("rateFeedbackStars") as any).setValue(5);
+        (oView.byId("txtFeedbackComment") as any).setValue("");
 
         this._oFeedbackDialog.open();
     }
@@ -183,25 +168,17 @@ public onOpenOrderFeedback(oEvent: any): void {
         }
     }
 
-    /**
-     * SUBMIT REVIEWS: Saves raw inputs directly to the CAP OData backend pipeline layer
-     */
-    // Open your OrderDetail.controller.ts and look at your onSubmitFeedbackForm method
+
 public async onSubmitFeedbackForm(): Promise<void> {
     const oView = this.getView()!;
     const oModel = oView.getModel();
 
-    // Guard: Prevent crashing if context wasn't loaded properly
     if (!this._oActiveFeedbackContext || !this._oActiveFeedbackContext.payload) {
         MessageToast.show("Error: Feedback context is missing.");
         return;
     }
-
-    // 1. Clean, direct extraction
     const iRatingValue = (oView.byId("rateFeedbackStars") as any).getValue();
     const sCommentText = (oView.byId("txtFeedbackComment") as any).getValue();
-
-    // Enforce data validation check
     if (!sCommentText || !sCommentText.trim()) {
         MessageToast.show("Please enter a text review comment.");
         return;
@@ -210,18 +187,14 @@ public async onSubmitFeedbackForm(): Promise<void> {
     const oUserModel = oView.getModel("currentUser") as any;
     const sCustomerId = oUserModel?.getProperty("/id")?.id || oUserModel?.getProperty("/id");
 
-    // 2. Direct list binding to the entity set
     const oFeedbackBindingList = (oModel as any).bindList("/Feedbacks");
 
-    // 3. Construct clean payload dynamically (OData V4 friendly)
     const oFinalPayload: any = {
         "customer_ID": String(sCustomerId),
         "rating": parseInt(iRatingValue, 10),
         "comment": sCommentText.trim()
     };
 
-    // ONLY append the mapping IDs if they actually have a value. 
-    // OData V4 prefers omitting fields over passing primitive nulls for key targets.
     if (this._oActiveFeedbackContext.payload.order_ID) {
         oFinalPayload.order_ID = this._oActiveFeedbackContext.payload.order_ID;
     }
@@ -232,13 +205,12 @@ public async onSubmitFeedbackForm(): Promise<void> {
         oFinalPayload.interaction_ID = this._oActiveFeedbackContext.payload.interaction_ID;
     }
 
-    console.log("🚀 Cleaned OData Payload:", oFinalPayload);
+    console.log("Cleaned OData Payload:", oFinalPayload);
 
     try {
         oView.setBusy(true);
-        this.onCloseFeedbackDialog(); // Dismiss dialog popout early for a smooth UX transition
+        this.onCloseFeedbackDialog(); 
 
-        // 4. Fire creation cycle matching the working interaction pattern
         const oNewContext = oFeedbackBindingList.create(oFinalPayload);
         await oNewContext.created();
         
@@ -277,12 +249,10 @@ public async onSubmitFeedbackForm(): Promise<void> {
         const oView = this.getView()!;
         const oModel = oView.getModel();
 
-        // Extract input strings directly from our open form controls
         const sInputTitle = (oView.byId("txtInteractionTitle") as any).getValue();
         const sInputPriority = (oView.byId("selInteractionPriority") as any).getSelectedKey();
         const sInputSummary = (oView.byId("txtInteractionSummary") as any).getValue();
 
-        // Enforce a simple data validation check
         if (!sInputTitle || !sInputSummary) {
             MessageToast.show("Please fill out all required form fields.");
             return;
@@ -294,7 +264,6 @@ public async onSubmitFeedbackForm(): Promise<void> {
 
         const oInteractionsList = (oModel as any).bindList("/Interactions");
 
-        // Construct the unified enterprise payload using metadata and form inputs
         const oFinalPayload = {
             "title": sInputTitle,
             "summary": sInputSummary,
@@ -312,14 +281,13 @@ public async onSubmitFeedbackForm(): Promise<void> {
 
         try {
             oView.setBusy(true);
-            this.onCloseInteractionDialog(); // Dismiss popout early for a smooth UX transition
-
+            this.onCloseInteractionDialog(); 
             const oNewContext = oInteractionsList.create(oFinalPayload);
             await oNewContext.created();
             
             MessageToast.show("Your support case has been submitted successfully!");
         } catch (oError) {
-            console.error("❌ Failed to commit interaction form:", oError);
+            console.error("Failed to commit interaction form:", oError);
             MessageToast.show("Error submitting ticket.");
         } finally {
             oView.setBusy(false);

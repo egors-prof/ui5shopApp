@@ -18,7 +18,6 @@ export default class ProductObjectPage extends Controller {
 
     public onInit(): void {
         const oRouter = UIComponent.getRouterFor(this);
-        // Listen exclusively for pattern matches hitting this specific layout route
         oRouter.getRoute("RouteProductObjectPage")!.attachPatternMatched(this._onObjectMatched, this);
         const oModel = this.getOwnerComponent()!.getModel();
                 const oOperation = (oModel as any).bindContext("/getMyRoles(...)");
@@ -26,7 +25,6 @@ export default class ProductObjectPage extends Controller {
                 const sCustomerId = oOperation.getBoundContext().getValue();
                 console.log("👤 Current secure Customer ID:", sCustomerId);
                 
-                // Save it to a local JSON model so all your functions can use it!
                 const oUserModel = new JSONModel({ id: sCustomerId });
                 this.getView()!.setModel(oUserModel, "currentUser");
                 });
@@ -47,30 +45,22 @@ private _fillCarouselIn(): void {
 
     console.log("Carousel located, initializing OData collection binding...");
 
-    // 🟢 Bind the carousel slides to the relative 'images' association array path
     oCarousel.bindAggregation("pages", {
-        path: "images", // 💡 Relative to the product detail parent context bind
+        path: "images", 
         parameters: {
-            "$select": "content,fileName,mediaType" // Optimize OData load payload
+            "$select": "content,fileName,mediaType" 
         },
-        // 🟢 The factory function runs for every photo row in your table database
         factory: (sId: string, oContext: any) => {
-    // 1. Get the frontend data model reference
     const oModel = this.getView()!.getModel() as any ;
     
-    // 2. Extract the base backend server origin path (e.g., "http://localhost:4004/odata/v4/crm/")
     const sServiceUrl = oModel!.getServiceUrl(); 
 
-    // 3. 🟢 COMBINE THEM: Strip the leading slash from the context path and append it to the base URL
-    const sRelativeContextPath = oContext.getPath().substring(1); // Removes the "/" from the beginning
+    const sRelativeContextPath = oContext.getPath().substring(1); 
     const sImageStreamUrl = sServiceUrl + sRelativeContextPath + "/content";
 
-    console.log("🟢 Absolute streaming image source URL destination constructed:", sImageStreamUrl);
-    // It should cleanly evaluate to: http://localhost:4004/odata/v4/crm/Products(...)/images(...)/content
 
     const sFileName = oContext.getProperty("fileName");
 
-    // 4. Return your updated card layout control
     return new CardImage(sId, {
         src: sImageStreamUrl,
         alt: sFileName,
@@ -119,12 +109,10 @@ private _onObjectMatched(oEvent: any): void {
 public formatMarketingBadgeText(fPrice: number, iStock: number, iTimesOrdered: number): string {
         if (fPrice === undefined || fPrice === null) { return ""; }
 
-        // Priority 1: High Urgency (Low Inventory)
         if (iStock > 0 && iStock <= 10) {
             return "Almost Gone";
         }
 
-        // Priority 2: Price Brackets
         if (fPrice >= 1000) {
             return "Ultra Luxury";
         } else if (fPrice >= 500) {
@@ -133,28 +121,27 @@ public formatMarketingBadgeText(fPrice: number, iStock: number, iTimesOrdered: n
             return "Great Value";
         }
 
-        // Priority 3: Velocity Metrics Fallback
         if (iTimesOrdered >= 100) {
             return "Top Seller";
         }
 
-        return "Staff Pick"; // Uniform baseline fallback label
+        return "Staff Pick"; 
     }
 
     public formatMarketingBadgeStatus(fPrice: number, iStock: number, iTimesOrdered: number): string {
         if (fPrice === undefined || fPrice === null) { return "None"; }
 
         if (iStock > 0 && iStock <= 10) {
-            return "Error"; // Red warning indicator
+            return "Error"; 
         }
 
         if (fPrice >= 1000) {
-            return "Warning"; // Orange highlight indicator
+            return "Warning";
         } else if (fPrice >= 500) {
-            return "Information"; // Blue corporate accent indicator
+            return "Information"; 
         }
 
-        return "Success"; // Green positive indicator for bargains/top sellers
+        return "Success"; 
     }
 
 
@@ -171,7 +158,6 @@ public formatMarketingBadgeText(fPrice: number, iStock: number, iTimesOrdered: n
     }
 
 
-    // Track the active cart draft globally or use a shared state fallback
 public async onAddProductToCart(oEvent: any): Promise<void> {
         console.log("custom controller");
         const oModel = this.getView()!.getModel();
@@ -197,7 +183,7 @@ public async onAddProductToCart(oEvent: any): Promise<void> {
         console.log(`Found ${aDraftContexts.length} draft records.`);
         if (aDraftContexts.length===0){
             try{
-                oView!.setBusy(true); // Lock the canvas layout
+                oView!.setBusy(true);
                 const data = {
                     "orderNumber":"test-num",
                     "status_code":"OPEN",
@@ -224,7 +210,7 @@ public async onAddProductToCart(oEvent: any): Promise<void> {
                 const oNewItemContext = oItemsListBinding.create(itemData);
                 await oNewItemContext.created();
             }catch(oError:any){
-                console.error("❌ Failed to create draft item:", oError);
+                console.error("Failed to create draft item:", oError);
             }finally{
                 console.log("unblocked");
                 oView!.setBusy(false); 
@@ -232,7 +218,7 @@ public async onAddProductToCart(oEvent: any): Promise<void> {
             
         }else{
             try{
-                oView!.setBusy(true); // Lock the canvas layout
+                oView!.setBusy(true); 
                 const existingDraftOrder = aDraftContexts[0].getObject();
                 console.log(existingDraftOrder);
                 console.log("existing Draft Id",existingDraftOrder.ID);
@@ -251,10 +237,10 @@ public async onAddProductToCart(oEvent: any): Promise<void> {
                 const oNewItemContext = oItemsListBinding.create(data);
                 await oNewItemContext.created();
                 } catch(oError:any){
-                    console.error("❌ Failed to create draft item:", oError);
+                    console.error("Failed to create draft item:", oError);
                 }finally {
                     console.log("unblocked");
-                    oView!.setBusy(false); // Unlock the canvas layout
+                    oView!.setBusy(false); 
             }
             
             
@@ -278,11 +264,9 @@ public onObjectPageQuantityChange(oEvent: any): void {
     const oButton = oParentContainer.getItems()[0];
 
     
-    // UI Logic: Hide if quantity drops to 0
     if (iNewValue === 0) {
         oStepInput.setVisible(false);
         oButton.setVisible(true);
-        // Tip: Remember to toggle your blue "Add to Cart" button back to true here if needed
     }
 
     const oProductContext = oStepInput.getBindingContext();
@@ -290,57 +274,50 @@ public onObjectPageQuantityChange(oEvent: any): void {
     const oModel = this.getView()!.getModel();
     const oView = this.getView();
 
-    // 1. Correctly read the customer ID string
     let sCustomerIdStr = "";
     const oUserModel = oView!.getModel("currentUser") as any;
     if (oUserModel) {
-        sCustomerIdStr = oUserModel.getProperty("/id"); // Removed the extra .id
-        console.log("🎯 Found Customer ID inside onQuantityChange:", sCustomerIdStr);
+        sCustomerIdStr = oUserModel.getProperty("/id"); 
+        console.log("Found Customer ID inside onQuantityChange:", sCustomerIdStr);
     }
 
-    // 2. Query Orders to find the active draft cart
     const oOrdersBinding = (oModel as any).bindList("/Orders");
     const oDraftFilter = new Filter("IsActiveEntity", FilterOperator.EQ, false);
     oOrdersBinding.filter(oDraftFilter);
 
     oOrdersBinding.requestContexts().then(async (aDraftContexts: any[]) => {
         if (aDraftContexts.length === 0) {
-            console.warn("⚠️ No active draft cart found in DB.");
+            console.warn("No active draft cart found in DB.");
             return;
         }
 
         const oParentOrderObj = aDraftContexts[0].getObject();
         const sCartID = oParentOrderObj.ID;
 
-        // 3. Build the path to the items collection inside this specific cart
         const sCartItemsPath = `/Orders(ID='${sCartID}',IsActiveEntity=false)/items`;
         const oCartItemsBinding = (oModel as any).bindList(sCartItemsPath);
 
-        // 4. CRUCIAL: Filter the items list binding to match the product clicked!
         const oProductFilter = new Filter("product_ID", FilterOperator.EQ, sProductID);
         oCartItemsBinding.filter(oProductFilter);
 
         try {
-            // 5. Ask the database to fetch the specific item context row
             const aItemContexts = await oCartItemsBinding.requestContexts();
 
             if (aItemContexts.length > 0) {
-                // SUCCESS: This is your true unique item context pointer!
                 const oTargetItemContext = aItemContexts[0];
 
                 if (iNewValue === 0) {
-                    console.log(`🗑️ Deleting item from draft cart DB...`);
+                    console.log(`Deleting item from draft cart DB...`);
                     oTargetItemContext.delete();
                 } else {
-                    // 🟢 This will now successfully trigger your HTTP PATCH request!
-                    console.log(`🔄 Setting property quantity to ${iNewValue}`);
+                    console.log(`Setting property quantity to ${iNewValue}`);
                     oTargetItemContext.setProperty("quantity", iNewValue);
                 }
             } else {
-                console.warn("⚠️ This product isn't actually in the database draft cart.");
+                console.warn("This product isn't actually in the database draft cart.");
             }
         } catch (oError) {
-            console.error("❌ Database update failed:", oError);
+            console.error("Database update failed:", oError);
         }
     });
 }
@@ -363,7 +340,6 @@ public async getCart(): Promise<any[]> {
     oListBinding.filter(oDraftFilter);
     
     try {
-        // 1. Await the draft order lookups
         const aDraftContexts = await oListBinding.requestContexts();
         
         if (aDraftContexts.length > 0) {
@@ -371,31 +347,26 @@ public async getCart(): Promise<any[]> {
             const sDraftItemPath = `/Orders(ID='${existingDraftOrder.ID}',IsActiveEntity=false)/items`;
             
             const oItemsBinding = (oModel as any).bindList(sDraftItemPath);
-            
-            // 2. Await the nested order line items from the database
             const aItemContexts = await oItemsBinding.requestContexts();
-            
-            // 3. 🟢 THE CHANGE: Map the context arrays into clean JavaScript data objects
             const aItemsArray = aItemContexts.map((oItemContext: any) => {
                 return oItemContext.getObject(); 
             });
 
-            console.log(`🚀 Returning array of ${aItemsArray.length} items.`);
-            return aItemsArray; // Returns the clean plain object array: [{product_ID: "...", quantity: 1}, ...]
+            console.log(`Returning array of ${aItemsArray.length} items.`);
+            return aItemsArray;
             
         } else {
-            console.log("ℹ️ No active draft cart records found.");
-            return []; // Return an empty array if no cart exists
+            console.log("ℹNo active draft cart records found.");
+            return []; 
         }
         
     } catch (oError) {
-        console.error("❌ getCart failed:", oError);
-        return []; // Return empty array on database failure
+        console.error("getCart failed:", oError);
+        return []; 
     }
 }
 
     public async syncListAndCart(): Promise<void> {
-    // 1. Unpack your asynchronous cart items array
     console.log("sync prod page . . .");
     const oButton = this.byId("heroAddToCartButton") as any ; 
     const oStepInput = this.byId("productQuantityInput") as any ; 

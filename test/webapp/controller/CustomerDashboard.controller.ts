@@ -35,7 +35,6 @@ private _onViewDisplayLogged(oEvent: UI5Event): void {
 }
 
 private _onRouteMatched(oEvent: UI5Event): void {
-        // TypeScript now perfectly understands .getParameter()!
         console.log("matched");
         const oArgs = (oEvent.getParameter as any)("arguments") as { "?query"?: { tab?: string } } | undefined;        
         console.log("Captured Routing Arguments:", oArgs); // <-- ADD THIS LOG
@@ -97,7 +96,7 @@ private authPress():void {
     const oModel = this.getOwnerComponent()!.getModel();
         const oOperation = (oModel as any).bindContext("/triggerAuth(...)");
         const oView = this.getView();
-        oView!.setBusy(true); // Lock the UI view canvas while checking identity
+        oView!.setBusy(true); 
         
         oOperation.execute().then(async () => {
             oView!.setBusy(false); // Release the UI lock
@@ -150,7 +149,7 @@ public async onRemoveCartItem(oEvent: any): Promise<void> {
         this.getSumCart();
 
     } catch (oError: any) {
-        console.error("❌ Failed to delete draft item: ", oError);
+        console.error("Failed to delete draft item: ", oError);
         MessageToast.show("Unable to remove item. Please try again.");
     } finally {
         oView?.setBusy(false);
@@ -172,7 +171,7 @@ private _onDashboardMatched(): void {
     const oUserModel = oView.getModel("currentUser") as any;
 
     if (oUserModel) {
-        console.log("👤 Live Profile Session Model Initialized:", JSON.stringify(oUserModel.getData()));
+        console.log("Live Profile Session Model Initialized:", JSON.stringify(oUserModel.getData()));
     }
 }
 
@@ -183,9 +182,7 @@ public onBeforeRendering(): void {
     if (oRouter) {
         const oRoute = oRouter.getRoute("TargetCustomerDashboard");
         if (oRoute) {
-            // Detach first to prevent duplicate memory leak listeners stacking up
             oRoute.detachPatternMatched(this._onViewDisplayLogged, this);
-            // Freshly attach the pattern handler for this page visit cycle
             oRoute.attachPatternMatched(this._onViewDisplayLogged, this);
             console.log("🔄 Router pattern listener re-bound successfully.");
         }
@@ -215,7 +212,6 @@ private _loadUserSessionProfile(): void {
         if (!oView) { return; }
         oView.setBusy(true);
 
-        // 1. Cast the core model to an OData V4 Model instance cleanly
         const oModel = this.getOwnerComponent()!.getModel();
         console.log(oModel);
         
@@ -224,25 +220,21 @@ private _loadUserSessionProfile(): void {
             return;
         }
         
-        // 2. Bind straight to your custom function path
         const oOperation = oModel.bindContext("/getMyRoles(...)") as any;
         console.log(oOperation);
 
-        // 3. Execute the operation down the wire
         oOperation.execute().then(() => {
             const oContext = oOperation.getBoundContext();
             
             if (oContext) {
                 const oResultData = oContext.getObject() as any;
 
-                // 4. Create the local JSONModel with the structured data map
                 const oUserProfileModel = new JSONModel({
                     isCRMAdmin: oResultData.isCRMAdmin,
                     isVendor: oResultData.isVendor,
                     username: oResultData.username,
                     id:oResultData.id,
                     
-                    // Spread the nested customerProfile attributes safely
                     profile: oResultData.customerProfile || {
                         firstName: "Guest",
                         lastName: "User",
@@ -250,7 +242,6 @@ private _loadUserSessionProfile(): void {
                     }
                 });
 
-                // 5. Attach it to the active view container layout using the model name prefix
                 oView.setModel(oUserProfileModel, "currentUser");
             }
             
@@ -258,7 +249,7 @@ private _loadUserSessionProfile(): void {
         }).catch((oError: any) => {
             oView.setBusy(false);
             MessageToast.show("Error loading personal profile information.");
-            console.error("❌ Profile load failed:", oError);
+            console.error("Profile load failed:", oError);
         });
     }
 
@@ -271,25 +262,19 @@ public async onShowOrdersPress(): Promise<void> {
     const bIsCurrentlyVisible = oTable.getVisible();
     const bNewVisibilityState = !bIsCurrentlyVisible;
 
-    // 1. Toggle visibility
+    // Toggle visibility
     oTable.setVisible(bNewVisibilityState);
 
     if (bNewVisibilityState) {
-        // 2. Flip Button properties to "Hide" mode
         oButton.setText("Hide Order History");
         oButton.setIcon("sap-icon://hide");
         oButton.setType("Default");
-
-        // 3. Force OData stream to fetch fresh finalized checkouts from the main ledger
         const oBinding = oTable.getBinding("items");
         if(oBinding){
             const aContexts = oBinding.getCurrentContexts(); 
-
-    // 3. Loop through the array to extract the raw JavaScript data objects
-        aContexts.forEach((oContext: any) => {
+            aContexts.forEach((oContext: any) => {
             const oRowObject = oContext.getObject();
             
-            // Now you can read properties straight from the database response data!
             console.log("Found Active Order ID:", oRowObject.ID);
             console.log("Virtual Total Amount:", oRowObject.totalAmount);
         });
@@ -302,10 +287,9 @@ public async onShowOrdersPress(): Promise<void> {
 
         if (oBinding) {
             oBinding.refresh();
-            console.log("📥 Fresh historic orders loaded from main ledger database.");
+            console.log("Fresh historic orders loaded from main ledger database.");
         }
     } else {
-        // Reset Button properties to original look
         oButton.setText("Show Order History");
         oButton.setIcon("sap-icon://history");
         oButton.setType("Emphasized");
@@ -327,7 +311,6 @@ public formatTierName(sStatusCode: string): string {
 
 
 public onTabSelect(oEvent: any): void {
-    // 1. Grab the selected item's key string token
     const sSelectedKey = oEvent.getParameter("key") || "";
     console.log("📥 Raw Tab Selected Key:", sSelectedKey);
     
@@ -363,7 +346,7 @@ public onTabSelect(oEvent: any): void {
             }
             }, 300);
 
-    // Safety guard: Clear the interval after 5 seconds so it doesn't run forever if the cart is truly empty
+    //Clear the interval after 5 seconds so it doesn't run forever if the cart is truly empty
             setTimeout(() => clearInterval(iIntervalId), 5000);
                 this.getSumCart();
             }
@@ -399,12 +382,8 @@ public async onCheckoutPress(oEvent: UI5Event): Promise<void> {
         const sOrderPath = `/Orders(ID=${sParentOrderId},IsActiveEntity=false)`;
         const oOrderContext = oModel.bindContext(sOrderPath).getBoundContext();
         const oOperation = oModel.bindContext("PublicStorefrontService.draftActivate(...)", oOrderContext);
-        
         await oOperation.execute();
-
-        // Only hide items after success
         aCardItem.forEach((card: any) => card.setVisible(false));
-        
         const totalLabel = this.byId("totalNumber") as any;
         totalLabel.setNumber(0);
         
@@ -424,10 +403,6 @@ public onAfterRendering(): void {
     if (!oList){
         return;
     } 
-
-    
-
-    // Safety guard: Clear the interval after 5 seconds so it doesn't run forever if the cart is truly empty
     
 }
 
@@ -435,7 +410,6 @@ public onAfterRendering(): void {
 public async onRemoveFromWishlist(oEvent: any): Promise<void> {
     const oCrossIcon = oEvent.getSource();
     
-    // 1. Resolve the specific OData row data context bounding instance
     const oContext = oCrossIcon.getBindingContext() as Context;
     if (!oContext) return;
 
@@ -444,15 +418,12 @@ public async onRemoveFromWishlist(oEvent: any): Promise<void> {
 
     try {
         const sProductName = oContext.getProperty("product/name") || "Item";
-        
-        // 2. Dispatch the standard asynchronous OData deletion query
         await oContext.delete();
         
-        // 3. Inform user. UI5 layout engines will auto-animate the card collapsing away
         MessageToast.show(`✨ ${sProductName} removed from your wishlist.`);
         
     } catch (oError: any) {
-        console.error("❌ Wishlist item deletion dropped:", oError);
+        console.error("Wishlist item deletion dropped:", oError);
         MessageToast.show("Could not remove item. Please try again.");
     } finally {
         oView?.setBusy(false);
@@ -493,7 +464,7 @@ public async onRemoveFromWishlist(oEvent: any): Promise<void> {
         const sFormattedTotal = nTotalSum.toFixed(2);
         
         oTotalControl.setNumber(sFormattedTotal); 
-        console.log(`💰 Pinned Dashboard Total updated to: ${sFormattedTotal} USD`);
+        console.log(`Pinned Dashboard Total updated to: ${sFormattedTotal} USD`);
     }
 
     }
@@ -526,7 +497,7 @@ public onOrderRowPress(oEvent: any): void {
 
     const sOrderId = oOrderContext.getProperty("ID");
 
-    console.log(`🚀 Routing to detail page with clean GUID: ${sOrderId}`);
+    console.log(`Routing to detail page with clean GUID: ${sOrderId}`);
 
     const oRouter = UIComponent.getRouterFor(this);
     oRouter.navTo("RouteOrderDetail", {
@@ -545,8 +516,6 @@ public onOrderRowPress(oEvent: any): void {
             }) as Dialog;
             oView.addDependent(this._oFeedbackDialog);
         }
-
-        // Dynamically set properties based on what row was clicked
         (oView.byId("txtFeedbackTargetName") as any).setText(this._oActiveFeedbackContext.targetName);
         (oView.byId("rateFeedbackStars") as any).setValue(5); 
         (oView.byId("txtFeedbackComment") as any).setValue(""); 
@@ -554,18 +523,14 @@ public onOrderRowPress(oEvent: any): void {
         this._oFeedbackDialog.open();
     }
 
-    /**
-     * Closes the feedback dialog box cleanly
-     */
+
     public onCloseFeedbackDialog(): void {
         if (this._oFeedbackDialog) {
             this._oFeedbackDialog.close();
         }
     }
 
-    /**
-     * Submits the interaction review payload directly to the /Feedbacks OData collection
-     */
+//submit
     public async onSubmitFeedbackForm(): Promise<void> {
         const oView = this.getView()!;
         const oModel = oView.getModel();
@@ -583,7 +548,6 @@ public onOrderRowPress(oEvent: any): void {
 
         const oFeedbackBindingList = (oModel as any).bindList("/Feedbacks");
 
-        // Unified payload linking perfectly to your interaction_ID context
         const oFinalPayload = {
             "customer_ID": String(sCustomerId),
             "rating": parseInt(iRatingValue, 10),
@@ -621,27 +585,25 @@ public onOpenInteractionFeedback(oEvent: any): void {
     if (!oRowContext) { return; }
     const oInteractionData = oRowContext.getObject() as any;
 
-    // Build the dynamic targeting payload using the exclusive association mappings
     this._oActiveFeedbackContext = {
         targetName: `Support Case Log ID: ${oInteractionData.caseNumber || "Ledger Entry"}`,
         payload: {
-            interaction_ID: oInteractionData.ID, // Links directly to the ticket ID
-            order_ID: null,                      // Mutual exclusivity flags are preserved clean
+            interaction_ID: oInteractionData.ID, 
+            order_ID: null,                      
             orderItem_ID: null
         }
     };
 
-    // Invoke your established asynchronous loader utility to show the popup form
     this._openFeedbackDialog();
 }
 
 
 public formatStatusCriticality(sStatusCode: string): string {
     switch (sStatusCode?.toUpperCase()) {
-        case "CLOSED":   return "Success";  // Green
-        case "RESOLVED": return "Success";  // Green
-        case "OPEN":     return "Warning";  // Orange/Yellow
-        case "PENDING":  return "None";     // Neutral Blue
+        case "CLOSED":   return "Success";  
+        case "RESOLVED": return "Success";  
+        case "OPEN":     return "Warning";  
+        case "PENDING":  return "None";     
         default:         return "None";
     }
 }
